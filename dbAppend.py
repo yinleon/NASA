@@ -8,9 +8,20 @@ from mpl_toolkits.basemap import Basemap
 This is a program that takes in a list of properly formatted CSV files(toAdd), 
 to append to the Global Seawater d18O database (infile) using Pandas.
 
-This program has robust plotting capacities using Basemaps, as well as 
-dynamic DB querrying based on any of the 11 fields-- 
-including seasonality, reference, and even location.
+This thanks to Pandas, there are dynamic database (DB) querrying for any of 
+the 11 fields-- including seasonality, reference, and location.
+
+The database is converted to Pandas dataframe(DF) data structure, 
+The DF can be accessed by typing 'df' into the command line after running.
+
+Pandas has thorough documentation, and great examples on their website below:
+--> http://pandas.pydata.org/pandas-docs/stable/tutorials.html
+
+The querry results can be plotted globally using Basemaps. 
+There is an example available by turning the 'seasons' switch to 1.
+
+the integer seasons is a logic switch(much like a boolean), used to access
+specific functions in this program for writing out files, searching the DF
 
 At this time, this program is intended to update these files...
 
@@ -28,36 +39,37 @@ v - 1.0
 
 # Files to be read/written in the parent directory
 filein      = 'dbO18.txt' #this file is downloaded from the d18o website.
+fileout     = 'dbO18_2015.txt' #output of the entire DB as a fixed-width txt
+csvout      = 'db18O.csv'
 toAdd       = ('Strauss2015.csv','CASES-Database.csv','Cox-Database.csv',
               'Conroy2012.csv')
-fileout     = 'dbO18_2015.txt' #output of the entire database as a fixed-width txt
-csvout      = 'db18O.csv'
 
 # Logic switches -- use these guys to turn functions on-and-off.
-convert         =   1       #set to 1: convert the database (DB) into a CSV, 
-                            #set to 2: convert CSV input to DB
-append2master   =   1       #set to 1: to add new CSV input to the DB
-printOut        =  -1       #set to 1: prints out DB
-plotALL         =  -1       #set to 1: plots a scatter for the DB
-search          =  -1       #set to 1: search specfic querry
-seasons         =   1       #set to 1: seasonal distribution of observtions
+convert2DF      =   1               #set to 1: convert CSV input to DB
+convert2CSV     =  -1               #set to 1: convert the DB into a CSV, 
+append2master   =  -1               #set to 1: to add new CSV input to the DB
+writeOut        =  -1               #set to 1: writes out DB to fileout
+plotALL         =  -1               #set to 1: plots a scatter for the DB
+search          =  -1               #set to 1: search specfic querry
+seasons         =  -1               #set to 1: seasonal distribution of observtions
 
-# Global Seawater d18O database format
-col=['lon','lat','month','year','depth','temp', 'sal', 'd18o','dD','notes','ref'] 
-fWid = ( 7,    6,      2,     4,      5,     6,     6,      6,   6,    15,   60)
+# Global Seawater d18O database format.
+col=\
+  ['lon','lat','month','year','depth','temp', 'sal', 'd18o','dD','notes','ref'] 
+fWid=( 7,    6,      2,     4,      5,     6,     6,      6,   6,    15,   60)
 
 # Read in Database into a Pandas Dataframe data structure
 df=pd.read_fwf(filein,widths=fWid,header=None,names=col,skip_blank_lines=True)
 
 # some variables...
 dfRows    = len(df.index-1)
-files2Add = len(toAdd)
 
+files2Add = len(toAdd)
 """****************************************************************************
 Automated reading of each CSV, and appending to existing DB.
 To troubleshoot adjust the range and double-check 'csv' in the shell.
 ****************************************************************************"""
-if (convert == 2):
+if (convert2DF == 1):
     for i in range(0,files2Add):
         csv=pd.read_csv(toAdd[i],sep=',',skiprows=1,names=col,na_filter=True)
         #              File Name,Delimiter, skip header
@@ -66,9 +78,16 @@ if (convert == 2):
             df = df.append(csv)     # add the contents of new csv into DB.
             dfRows= len(df.index-1) # update the number of records in the DB.
 """****************************************************************************
+Use this function to convert DF to to CVS, and write it out as a csv.
+****************************************************************************"""
+if (convert2CSV == 1):
+    toCSV=pd.DataFrame.to_csv(df,sep=',',line_terminator='\n')
+    csvout = open(csvout, 'w')      # opens the file to write into
+    csvout.write(toCSV)             # writes df to csv... 
+"""****************************************************************************
 Use this function to write the database into a fixed-width text file.
 ****************************************************************************"""
-if(printOut==1):
+if(writeOut==1):
     df=df.fillna('')
     print("******************************************************************")        
     print "Opening the file..."
@@ -85,13 +104,6 @@ if(printOut==1):
         dbOut.write("\n")
     print "Closing the file..."
     dbOut.close
-"""****************************************************************************
-Use this function to convert DF to to CVS, and write it out as a csv.
-****************************************************************************"""
-if (convert == 1):
-    toCSV=pd.DataFrame.to_csv(df,sep=',',line_terminator='\n')
-    csvout = open(csvout, 'w')      # opens the file to write into
-    csvout.write(toCSV)             # writes df to csv... 
 """****************************************************************************
 Use this switch to segregate specific values per field and plot them.
 I've used Winter distribution as an example.
@@ -207,8 +219,9 @@ if(seasons==1):
     plt.title('Seaonal Distribution of Observed d18O')
     plt.show
     plt.savefig('seasonalDistribution', dpi = 300)
-    
-# Scatter plot for all points WIP!!! 
+"""****************************************************************************
+Use this to generate a scatter plot for all points by unique reference.
+****************************************************************************"""
 if (plotALL==1):
     refList = df.ref.unique()
     refSize = refList.size
