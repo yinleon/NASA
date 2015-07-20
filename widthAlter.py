@@ -17,7 +17,7 @@ Conroy 2012         'Conroy2012.csv'        191 rows        S
 """
 
 
-filein      ='dbO18.txt'
+filein      ='dbO18.txt' #this file is downloaded from the d18o website.
 toAdd       =('Strauss2015.csv','CASES-Database.csv','Cox-Database.csv',
               'Conroy2012.csv')
 fileout     ='dbO18_2015.txt'
@@ -26,17 +26,18 @@ fileout     ='dbO18_2015.txt'
 convert         =   2       #set to 1: convert the database (DB) into a CSV, 
                             #set to 2: convert CSV input to DB
 append2master   =   1       #set to 1: to add new CSV input to the DB
-printOut        =   1       #set to 1: prints out DB
-plot            =   1       #set to 1: plots a scatter for the DB
-search          =  -1       #set to 1: search spefici querry
-
-# Global Seawaster d18) database format
+printOut        =  -1       #set to 1: prints out DB
+plot            =  -1       #set to 1: plots a scatter for the DB
+search          =  -1       #set to 1: search specfic querry
+seasons         =   1       #set to 1: seasonal distribution of observtions
+# Global Seawaster d18O database format
 col=['lon','lat','month','year','depth','temp', 'sal', 'd18o','dD','notes','ref'] 
 fWid = ( 7,    6,      2,     4,      5,     6,     6,      6,   6,    15,   60)
 
 # Read in Database into a Pandas Dataf rame data structure
 df=pd.read_fwf(filein,widths=fWid,header=None,index_col=False,names=col,skip_blank_lines=True)
 
+# some variables...
 dfRows    = len(df.index-1)
 files2Add = len(toAdd)
 
@@ -51,8 +52,8 @@ if (convert == 2):
         csv=pd.read_csv(toAdd[i],sep=',',skiprows=1,names=col,na_filter=True)
         #              File Name,Delimiter, skip header
         if (append2master == 1):
-            df = df.append(csv)
-            dfRows= len(df.index-1)
+            df = df.append(csv)     #add the contents of new csv into DB
+            dfRows= len(df.index-1) #update the number of records in the DB
 
 # Print the output dataframe
 if(printOut==1):
@@ -65,24 +66,126 @@ if(printOut==1):
 #        print ( '{:7.2f}{:>6.2f}{:>2.0f}{:>4.0f}{:>5.0f}{:6.2f}{:6.2f}{:6.2f}{:6.2f}{:>15}{:>60}'\
 #        .format(v[0][i],v[1][i],v[2][i],v[3][i],v[4][i],v[5][i],v[6][i],v[7][i],v[8][i],\
 #        v[9][i],v[10][i]) )
-        dbOut.write(( '{:7.2f}{:>6.2f}{:>2.0f}{:>4.0f}{:>5.0f}{:6.2f}{:6.2f}{:6.2f}{:6.2f}{:>15}{:>60}'\
+        dbOut.write(( \
+        '{:7.2f}{:>6.2f}{:>2.0f}{:>4.0f}{:>5.0f}{:6.2f}{:6.2f}{:6.2f}{:6.2f}{:>15}{:>60}'\
         .format(v[0][i],v[1][i],v[2][i],v[3][i],v[4][i],v[5][i],v[6][i],v[7][i],v[8][i],\
         v[9][i],v[10][i]) ))
         dbOut.write("\n")
     print "Closing the file..."
     dbOut.close
-
+"""
+Use this switch to segregate specific values per field and plot them.
+"""
 if(search==1):
     # search for specific values
     fromCol     = 'month'       # What column/field are we interested in?
-    values      = (9,10,11,12)  # Put what you're looking for here!
+    values      = (12,1,2)  # Put what you're looking for here!
     uniqueVal   = len(values)   # This is for automation
     uniqueQuar  = 1
-    # 
-    querry = df.loc[df[fromCol]== values[0]]
+        
+    querry = df.loc[df[fromCol] == values[0]]
     for i in range(1,uniqueVal):
-        querry=querry.append(df.loc[df[fromCol]== values[i]])
+        querry=querry.append(df.loc[df[fromCol] == values[i]])
     print"found",len(querry),"instances of",fromCol,"with values of:",values
+    
+    # plot the results!
+    refList = querry.ref.unique()
+    refSize = refList.size
+    
+    plt.figure(figsize=(12,12))
+    map = Basemap(projection='mill', lat_0=0, lon_0=0)
+    map.drawcoastlines()
+    map.fillcontinents()
+    map.drawmapboundary()
+    
+    x1 = querry.lon.values.T.tolist()
+    y1 = querry.lat.values.T.tolist() 
+    x, y = map(x1, y1)
+    
+    map.scatter(x, y, marker='o',color='k',label=querry.ref.unique())
+    
+    plt.title('Winter Distribution of Observed d18O')
+    plt.show
+"""
+Use this function to section off the observed datapoints seasonally.
+"""   
+if(seasons==1):
+    # Seasonal split!
+    fromCol     = 'month'       # What column/field are we interested in?
+    winter      = (12,1,2)  # Put what you're looking for here!
+    spring      = (3,4,5)  # Put what you're looking for here!
+    summer      = (6,7,8)  # Put what you're looking for here!
+    fall        = (9,10,11)  # Put what you're looking for here!
+    uniqueVal   = len(winter)   # This is for automation
+    
+    #   Section off winter months  
+    querryW = df.loc[df[fromCol] == winter[0]]
+    for i in range(1,uniqueVal):
+        querryW=querryW.append(df.loc[df[fromCol] == winter[i]])
+    refListW = querryW.ref.unique()
+    refSize = refListW.size
+    print"found",len(querryW),"instances of",fromCol,"with values of:",winter,"from",refSize,"unique references"
+    # Section off spring months  
+    querryS = df.loc[df[fromCol] == spring[0]]
+    for i in range(1,uniqueVal):
+        querryS=querryS.append(df.loc[df[fromCol] == spring[i]])
+    refListS = querryS.ref.unique()
+    refSize = refListS.size
+    print"found",len(querryS),"instances of",fromCol,"with values of:",spring,"from",refSize,"unique references"
+    # section off summer months
+    querrySM = df.loc[df[fromCol] == summer[0]]
+    for i in range(1,uniqueVal):
+        querrySM=querrySM.append(df.loc[df[fromCol] == summer[i]])
+    refListSM = querrySM.ref.unique()
+    refSize = refListSM.size    
+    print"found",len(querrySM),"instances of",fromCol,"with values of:",summer,"from",refSize,"unique references"
+    # section off fall months
+    querryF = df.loc[df[fromCol] == fall[0]]
+    for i in range(1,uniqueVal):
+        querryF=querryF.append(df.loc[df[fromCol] == fall[i]])
+    refListF = querryF.ref.unique()
+    refSize = refListF.size
+    print"found",len(querryF),"instances of",fromCol,"with values of:",fall,"from",refSize,"unique references"   
+    
+    # plot the dictributions...
+    plt.figure(figsize=(12,12))
+    map = Basemap(projection='mill', lat_0=0, lon_0=0)
+    map.drawcoastlines()
+    map.fillcontinents()
+    map.drawmapboundary()
+    
+    #establish lon and Lat per season...    
+    x1 = querryS.lon.values.T.tolist()
+    y1 = querryS.lat.values.T.tolist() 
+    xS, yS = map(x1, y1)
+    map.scatter(xS, yS, marker='o',color='g',label='Spring')
+    plt.title('Spring Distribution of Observed d18O')
+    plt.show
+    
+    x1 = querrySM.lon.values.T.tolist()
+    y1 = querrySM.lat.values.T.tolist() 
+    xSM, ySM = map(x1, y1)
+    map.scatter(xSM, ySM, marker='o',color='r',label='Summer')
+#    plt.title('Summer Distribution of Observed d18O')
+#    plt.show
+    
+    x1 = querryF.lon.values.T.tolist()
+    y1 = querryF.lat.values.T.tolist() 
+    xF, yF = map(x1, y1)
+    map.scatter(xF, yF, marker='o',color='m',label='Fall')
+#    plt.title('Fall Distribution of Observed d18O')
+#    plt.show
+    
+    x1 = querryW.lon.values.T.tolist()
+    y1 = querryW.lat.values.T.tolist() 
+    xW, yW = map(x1, y1)
+    map.scatter(xW, yW, marker='o',color='k',label='winter')
+#    plt.title('Winter Distribution of Observed d18O')
+#    plt.show    
+    
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),ncol=4)
+    plt.title('Seaonal Distribution of Observed d18O')
+    plt.show
     
 # Scatter plot for all points   WIP!!! 
 if (plot==1):
