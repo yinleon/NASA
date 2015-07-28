@@ -32,7 +32,7 @@ Cases 2012          'Cases2012.csv'         485  records    C
 COX 2010,2001       'COX2010_2001.csv'      88   records    C
 Conroy 2012         'Conroy2012.csv'        191  records    S
 Tiwari 2013         'Tiwari2013.csv'        76   records    S           7.20.15
-Brown 2014          'BROWN2014.csv'         1207 records    C                        7.25.15
+Brown 2014          'BROWN2014.csv'         1207 records    C           7.25.15
 Geotraces 2014...
 Rijkenberg 2011     'GeoRijkenberg2011.csv' 432 records     C
 Jenkins 2010        'GeoJenkins2010.csv'    192 records     C  
