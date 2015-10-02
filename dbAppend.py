@@ -5,7 +5,10 @@ from netCDF4 import Dataset
 import os
 from mpl_toolkits.basemap import Basemap
 import colorsys
+<<<<<<< HEAD
+=======
 from scipy.interpolate import spline
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
 
 """
 Pt I
@@ -41,6 +44,11 @@ Rijkenberg 2011     'GeoRijkenberg2011.csv' 432 records     C
 Jenkins 2010        'GeoJenkins2010.csv'    192 records     C  
 
 total:                                      2942
+<<<<<<< HEAD
+
+Written by Leon Yin for NASA GISS NYCRI 2015
+Please consult NASA GISS or the author(leon.yin@nyu.edu)for use.
+=======
 
 Pt II
 The Global Gridded Dataset records the coordinates for each water mass according
@@ -49,11 +57,103 @@ It makes a dataframe for each water mass, plots d18O-S relationship, and jackkni
 
 Written by Leon Yin for NASA GISS NYCRI 2015
 Please consult NASA GISS or the author (leon.yin@nyu.edu) for questions
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
 
 v - 0.1.2
 """
 # Files to be read/written in the parent directory
 filein      = 'dbO18.txt'       # this file is downloaded from the d18o website.
+<<<<<<< HEAD
+fileout     = 'dbO18_2015.txt'  # output of the entire DB as a fixed-width txt
+csvout      = 'eurasianBasin.csv'  # replace 2015 with specifics!
+toAdd       = ('Strauss2015.csv','Cases2012.csv','COX2010_2001.csv',
+              'Conroy2012.csv','Tiwari2013.csv','BROWN2014.csv',
+              'GeoRijkenberg2011.csv','GeoJenkins2010.csv')
+
+# Logic switches -- use these guys to turn functions on-and-off.
+convert2DF      =   1               #set to 1: convert CSV input to DB
+convert2CSV     =  -1               #set to 1: convert the DB into a CSV, 
+append2master   =   1               #set to 1: to add new CSV input to the DB
+writeOut        =   1               #set to 1: writes out DB to fileout
+plotALL         =  -1               #set to 1: plots a scatter for the DB
+search          =  -1               #set to 1: search specfic querry
+seasons         =  -1               #set to 1: seasonal distribution of observtions
+uniqueArc       =  -1
+outlierELIM     =   1
+annual          =   1
+melt            =   1
+writeOutIce     =  -1
+save            =  -1
+
+"""****************************************************************************
+Some necessary functions
+****************************************************************************"""
+def _get_colors(num_colors):
+    colors=[]
+    for i in np.arange(0., 360., 360. / num_colors):
+        hue = i/360.
+        lightness   = (50 + np.random.rand() * 10) / 100.
+        saturation  = (90 + np.random.rand() * 10) / 100.
+        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
+    return colors
+
+"""~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The following section should be used to update and export the database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""
+# Global Seawater d18O database format.
+col=\
+  ['lon','lat','month','year','depth','temp', 'sal', 'd18o','dD','notes','ref'] 
+fWid=( 7,    6,      2,     4,      5,     6,     6,      6,   6,    15,   60)
+
+# Read in Database into a Pandas Dataframe data structure
+df=pd.read_fwf(filein,widths=fWid,header=None,names=col,skip_blank_lines=True)
+
+# some variables...
+dfRows    = len(df.index-1) # number of records in current DF
+ogLen     = len(df.index-1) # number of records in DF from filein
+files2Add = len(toAdd)      # number of sources to add
+
+plt.figure(figsize=(7,7))  
+map = Basemap(projection='npstere',boundinglat=68,lon_0=330,resolution='l')
+parallels = np.arange(-90.,90.,4.)
+meridians = np.arange(-180.,181.,10.)
+map.drawparallels(parallels,labels=[False,False,False,True])
+map.drawmeridians(meridians,labels=[True,False,False,False])
+map.drawcoastlines()
+map.fillcontinents()
+map.drawmapboundary()
+
+x1 = df.lon.values.T.tolist()
+y1 = df.lat.values.T.tolist()
+z1 = df.d18o.values.T.tolist()
+x, y = map(x1, y1)
+map.scatter(x,y,c=z1,marker='o',s=16,linewidth=.2)
+plt.title('Arctic Observed $\delta^{18}$O',fontsize=14)
+plt.clim(-5.6,2.8)
+cbar = plt.colorbar(orientation='vertical')
+cbar.ax.set_xlabel('$\delta^{18}$O')
+if(save == 1):
+    plt.savefig('valDistro', dpi = 300)
+plt.show()
+
+"""****************************************************************************
+Automates reading each CSV, and appending to existing DB.
+To troubleshoot adjust the range and double-check 'csv' in the shell.
+****************************************************************************"""
+if (convert2DF == 1):
+    print("******************************************************************")        
+    print"Integrating CSV into Global d18o Seawater Database..."    
+    for i in range(0,files2Add):
+        print "opening",toAdd[i],""
+        csv2DF=pd.read_csv(toAdd[i],sep=',',skiprows=1,names=col,na_filter=True)
+        #              File Name,Delimiter, skip header
+        dfRows= len(df.index-1)
+        if (append2master == 1):
+            df = df.append(csv2DF)  # add contents of new csv into DB.
+            dfRows= len(df.index-1) # update the number of records in DB.
+    print dfRows-ogLen,"records added to the database."
+    print("******************************************************************")        
+=======
 fileout     = 'dbO18_2015.txt'  # output of the entire DB as a fixed-width txt/ASCII format
 csvout      = 'dbO18_2015.csv'  # replace 2015 with specifics!
 
@@ -117,22 +217,57 @@ def percentile_based_outlier(data, threshold=95):
     diff = (100 - threshold) / 2.0
     minval, maxval = np.percentile(data, [diff, 100 - diff])
     return (data < minval) | (data > maxval)
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
 
 """****************************************************************************
 Use this function to convert DF to to CVS, and write it out as a csv.
 ****************************************************************************"""
+<<<<<<< HEAD
+if (convert2CSV == 1):
+=======
 def convert2CSV(df,csvout):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     df2csv = 'dbo18_2015.csv'
     toCSV=pd.DataFrame.to_csv(df2csv,sep=',',line_terminator='\n')
     csvout = open(csvout, 'w')      # opens the file to write into
     csvout.write(toCSV)             # writes df to csv... 
     print "Database transferred to csv..."
     csvout.close()
+<<<<<<< HEAD
+"""****************************************************************************
+Seek vengence on outliers from variable high latitutes.
+ID's determined using Jack knife statstical analysis in osSlopes.py...
+Known troublsome data...
+
+id     lon  lat  month  year  depth   temp    sal  d18o    dD                ref 
+18067    3   80      6  1984      0  -1.20  20.00  0.14 -99.9  Ostlund and Grall (1993)  
+
+replace hard coded idOdeath with killList from osSlopes.py for easy(but mindless)
+removal of outliers.
+****************************************************************************"""
+if (outlierELIM == 1):
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    print "Destroying outliers..."
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+    idOdeath    = [18067,519,825,613,18383]
+    lenOdeath   = len(idOdeath)
+    for toKill in range(lenOdeath):     # filters DF by natural index.
+        df = df[df.index != idOdeath[toKill]] 
+    print lenOdeath,"outliers ELIMINATED!"
+    dfRows    = len(df.index-1)
+    print("\m/ -___- \m/")
+"""****************************************************************************
+Use this function to write the database into a fixed-width text file.
+****************************************************************************"""
+if (writeOut == 1):
+=======
 
 """****************************************************************************
 Use this function to write the database into a fixed-width text file.
 ****************************************************************************"""
 def writeOut(df):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     df=df.fillna('')                #replace NaN values with spaces
     temp = 'temp.txt'
     print("******************************************************************")        
@@ -154,6 +289,23 @@ def writeOut(df):
     fout.close
     fin.close
     os.remove(temp)                 # Remove the temporary file.
+<<<<<<< HEAD
+"""~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The following section should be used to search and the database.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""
+
+"""****************************************************************************
+Use this switch to segregate specific values per field and plot them.
+I've used Winter distribution as an example.
+****************************************************************************"""
+if (search == 1):
+    # search for specific values
+    fromCol     = 'month'           # What column are you interested in?(ln:72)
+    values      = (12,1,2)          # Put what you're looking for here!
+    uniqueVal   = len(values)       # How many automations are required?
+    
+    # Collect values from specified col into new DF.
+=======
 """****************************************************************************
 Plots all the measurements according to the d18O value
 ****************************************************************************"""
@@ -196,6 +348,7 @@ def search(df,fromCol,values):
      # How many automations/searches are required?
     uniqueVal   = len(values)      
     # Collect values from specified col into new DF.    
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     querry = df.loc[df[fromCol] == values[0]]
     for i in range(1,uniqueVal):
         querry=querry.append(df.loc[df[fromCol] == values[i]])
@@ -207,7 +360,11 @@ def search(df,fromCol,values):
     print"Found",refSize,"references containing search results listed below...\n",refList
     
     # plot the results! Below is optional
+<<<<<<< HEAD
+    plt.figure(figsize=(12,12))
+=======
     plt.figure(figsize=(9,9))
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     map = Basemap(projection='mill', lat_0=0, lon_0=0)
     map.drawcoastlines()
     map.fillcontinents()
@@ -219,13 +376,21 @@ def search(df,fromCol,values):
     
     map.scatter(x, y, marker='o',color='k',s=9)
     
+<<<<<<< HEAD
+    plt.title(r'Winter Distribution of Observed $\delta^{18}$O')
+=======
     plt.title(r'Winter Distribution of Observed $\delta^{18}$O',size=16)
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     plt.show
 """****************************************************************************
 Use this function to section off the observed datapoints seasonally.
 This is an extension of the above function.
 ****************************************************************************"""
+<<<<<<< HEAD
+if (seasons == 1):
+=======
 def pltSeason(df):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     # Seasonal split!
     fromCol     = 'month'           # What column/field are we interested in?
     winter      = (12,1,2)          # Winter Months
@@ -324,7 +489,11 @@ def pltSeason(df):
 Inter-annual distribution...
 Something to be explored -LY
 ****************************************************************************"""
+<<<<<<< HEAD
+if (annual == 1):
+=======
 def pltAnnual(df):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     plt.figure(figsize=(9,7))  
     map = Basemap(projection='npstere',boundinglat=68,lon_0=330,resolution='l')
     parallels = np.arange(-90.,90.,4.)
@@ -366,12 +535,17 @@ def pltAnnual(df):
 """****************************************************************************
 Use this to generate a scatter plot for all points by unique reference.
 ****************************************************************************"""
+<<<<<<< HEAD
+if (plotALL == 1):
+=======
 def pltRef(df):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     refList = df.ref.unique()       # creates list of unique references from DB
     refSize = refList.size          # how large is the list?
     
     colorSwatch=_get_colors(refSize)# get enough colors for each point. 
     mark = ['o','v','s','d']        # pool of shapes for scatter
+<<<<<<< HEAD
     
     plt.figure(figsize=(10,10))     # initiate plot w/ dimensions.
     map = Basemap(projection='robin', lat_0=0, lon_0=0)
@@ -379,6 +553,15 @@ def pltRef(df):
     map.fillcontinents()
     map.drawmapboundary()
     
+=======
+    
+    plt.figure(figsize=(10,10))     # initiate plot w/ dimensions.
+    map = Basemap(projection='robin', lat_0=0, lon_0=0)
+    map.drawcoastlines()
+    map.fillcontinents()
+    map.drawmapboundary()
+    
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     for i in range(0,refSize):
         #breaks dataframe into subdataframes of unique references    
         uniqueRef=refList[i]
@@ -402,7 +585,11 @@ def pltRef(df):
 """****************************************************************************
 Use this to generate a scatter plot for all arctic points by unique reference.
 ****************************************************************************""" 
+<<<<<<< HEAD
+if (uniqueArc == 1):
+=======
 def pltArcRef(df):
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     # Define the Arctic...
     newArc = df.loc[df.lat>=65.8]
     refList = newArc.ref.unique()
@@ -440,6 +627,118 @@ def pltArcRef(df):
     if (save == 1):
         plt.savefig('arcDist.png', bbox_inches="tight" ,additional_artists=art,format='png', dpi=200)
 #       plt.savefig('arcDist.eps', format='eps', dpi=1000) #for vectors
+<<<<<<< HEAD
+    plt.show
+"""****************************************************************************
+Separates DB into two DF's one for melt and one for frozen
+****************************************************************************"""
+if (melt == 1):
+    print("******************************************************************")        
+    fromCol     = 'month'           # What column/field are we interested in?
+    ice     = (1,2,3,4,10,11,12)    # Winter Months
+    water   = (5,6,7,8,9)           # Spring Months may-sept
+    iLen    = len(ice)
+    wLen    = len(water)            # This is for automation'ssake
+    
+    #   Section off frozen months  
+    iceDF = df.loc[df[fromCol] == ice[0]]
+    for i in range(1,iLen):
+        iceDF=iceDF.append(df.loc[df[fromCol] == ice[i]])
+    refListIce = iceDF.ref.unique()
+    refSize = refListIce.size
+    print"found",len(iceDF),"instances of",fromCol,"with values of:",ice,\
+    "from",refSize,"unique references"
+    
+    # Section off melt months  
+    waterDF = df.loc[df[fromCol] == water[0]]
+    for i in range(1,wLen):
+        waterDF=waterDF.append(df.loc[df[fromCol] == water[i]])
+    refListWater = waterDF.ref.unique()
+    refSize = refListWater.size
+    print"found",len(waterDF),"instances of",fromCol,"with values of:",water,\
+    "from",refSize,"unique references"
+   
+   # write the DB for ice and melt into .dat files for global gridded dataset.
+    if (writeOutIce == 1):
+        # Ice season
+        iceDf=iceDF.fillna('')
+        temp = 'temp.txt'
+        fileout = 'ice.dat'
+        print("******************************************************************")        
+        dbOut = open(temp, 'w')
+        v = iceDf.values.T.tolist()        # The DF must be converted to a list first.
+        for i in range(0,len(iceDF)):       # Right each row into the file.
+            dbOut.write(( \
+            '{:7.2f}{:>6.2f}{:>2.0f}{:>4.0f}{:>5.0f}{:6.2f}{:6.2f}{:6.2f}{:6.1f}{:>15}{:>60}'\
+            .format(v[0][i],v[1][i],v[2][i],v[3][i],v[4][i],v[5][i],v[6][i],v[7][i],v[8][i],\
+            v[9][i],v[10][i]) ))
+            dbOut.write("\n")
+        dbOut.close
+        # swap -99.90 with -99.9
+        with open(fileout, "wt") as fout:
+            with open(temp, "rt") as fin:
+                for line in fin:
+                    fout.write(line.replace('-99.90', ' -99.9'))
+        print "Database transferred to txt..."
+        fout.close
+        fin.close
+        os.remove(temp) 
+        
+        # Time for meltseason
+        waterDf=waterDF.fillna('')
+    
+        fileout = 'melt.dat'
+        dbOut = open(temp, 'w')
+        v = waterDf.values.T.tolist()        # The DF must be converted to a list first.
+        for i in range(0,len(waterDF)):       # Right each row into the file.
+            dbOut.write(( \
+            '{:7.2f}{:>6.2f}{:>2.0f}{:>4.0f}{:>5.0f}{:6.2f}{:6.2f}{:6.2f}{:6.1f}{:>15}{:>60}'\
+            .format(v[0][i],v[1][i],v[2][i],v[3][i],v[4][i],v[5][i],v[6][i],v[7][i],v[8][i],\
+            v[9][i],v[10][i]) ))
+            dbOut.write("\n")
+        dbOut.close
+        # swap -99.90 with -99.9
+        with open(fileout, "wt") as fout:
+            with open(temp, "rt") as fin:
+                for line in fin:
+                    fout.write(line.replace('-99.90', ' -99.9'))
+        print "Database transferred to txt..."
+        fout.close
+        fin.close
+        os.remove(temp) 
+
+    #surface only
+    surfDep     =   10 
+    iceDF       =  iceDF.loc[iceDF.depth<=surfDep]
+    waterDF     =  waterDF.loc[waterDF.depth<=surfDep]
+    
+    # Plot 1
+    plt.figure(figsize=(7,7))  
+    map = Basemap(projection='npstere',boundinglat=68,lon_0=330,resolution='l')
+    parallels = np.arange(-90.,90.,4.)
+    meridians = np.arange(-180.,181.,10.)
+    map.drawparallels(parallels,labels=[False,False,False,True])
+    map.drawmeridians(meridians,labels=[True,False,False,False])
+    map.drawcoastlines()
+    map.fillcontinents()
+    map.drawmapboundary()
+    
+    x1 = iceDF.lon.values.T.tolist()
+    y1 = iceDF.lat.values.T.tolist()
+    z1 = iceDF.d18o.values.T.tolist()
+    x2, y2 = map(x1, y1)
+    map.scatter(x2,y2,c=z1,marker='o',s=16,linewidth=.2)
+    plt.title('Arctic Frozen Season Observed $\delta^{18}$O',fontsize=14)
+    plt.clim(-5.6,2.8)
+    cbar = plt.colorbar(orientation='vertical')
+    cbar.ax.set_xlabel('$\delta^{18}$O')
+    if(save == 1):
+        plt.savefig('frozenObs', dpi = 300)
+    plt.show()
+    
+    # Plot 2
+    plt.figure(figsize=(7,7))  
+=======
     plt.show
 """****************************************************************************
 Separates DB into two DF's one for melt and one for frozen NOTE: fix this...
@@ -868,12 +1167,45 @@ def jack():
     plt.figure(figsize=(7,7)) 
     parallels = np.arange(-90.,91.,4)
     meridians = np.arange(-180.,181.,10.)
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     map = Basemap(projection='npstere',boundinglat=68,lon_0=330,resolution='l')
     map.drawparallels(parallels,labels=[False,False,False,True])
     map.drawmeridians(meridians,labels=[True,False,False,False])
     map.drawcoastlines()
     map.fillcontinents()
     map.drawmapboundary()
+<<<<<<< HEAD
+    
+    x1 = waterDF.lon.values.T.tolist()
+    y1 = waterDF.lat.values.T.tolist()
+    z1 = waterDF.d18o.values.T.tolist()
+    x2, y2 = map(x1, y1)
+    map.scatter(x2,y2,c=z1,marker='o',s=16,linewidth=.2)
+    plt.title('Arctic Melt Season Observed $\delta^{18}$O',fontsize=14)
+    plt.clim(-5.6,2.8)
+    cbar = plt.colorbar(orientation='vertical')
+    cbar.ax.set_xlabel('$\delta^{18}$O')
+    if(save == 1):
+        plt.savefig('meltObs', dpi = 300)
+    plt.show()
+
+    plt.figure(figsize=(7,7))  
+    map = Basemap(projection='npstere',boundinglat=68,lon_0=330,resolution='l')
+    parallels = np.arange(-90.,90.,4.)
+    meridians = np.arange(-180.,181.,10.)
+    map.drawparallels(parallels,labels=[False,False,False,True])
+    map.drawmeridians(meridians,labels=[True,False,False,False])
+    map.drawcoastlines()
+    map.fillcontinents()
+    map.drawmapboundary()
+    
+    x1 = df.lon.values.T.tolist()
+    y1 = df.lat.values.T.tolist()
+    z1 = df.d18o.values.T.tolist()
+    x2, y2 = map(x1, y1)
+    map.scatter(x2,y2,c=z1,marker='o',s=16,linewidth=.2)
+    plt.title('Arctic Frozen Season Observed $\delta^{18}$O',fontsize=14)
+=======
 
     x1 = df.lon.values.T.tolist()
     y1 = df.lat.values.T.tolist()
@@ -888,10 +1220,15 @@ def jack():
     # Outliers location shown as larger square
     map.scatter(x3,y3,c=z2,marker='s',s=40,linewidth=.6)
     plt.title('Arctic Observed $\delta^{18}$O Outliers',fontsize=14)
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
     plt.clim(-5.6,2.8)
     cbar = plt.colorbar(orientation='vertical')
     cbar.ax.set_xlabel('$\delta^{18}$O')
     if(save == 1):
+<<<<<<< HEAD
+        plt.savefig('valDistro', dpi = 300)
+    plt.show()
+=======
         plt.savefig('arcticOutliers.png',dpi = 300)
     plt.show()
 
@@ -1377,3 +1714,4 @@ sizeD18     =   (10,14,10,8)
 linWid      =   3.5
 skip        =   -99.9
 surfDep     =   10      # depth of the surface (meters).
+>>>>>>> 05c94e426fb21cf2dd09308e4060551aa427fa7f
