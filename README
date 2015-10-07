@@ -1,0 +1,2 @@
+
+This is a bin containing scripts written in Python and Fortran for updating the NASA GISS Global Seawater Oxygen-18 Database and leveraging it for statsitical analysis, data visualization and the creation of a Global Gridded Oxygen-18 Dataset. The main function is O18db.py, and is well documented with examples in the iPython notebook d18O_documentation.ipynb. Please clone this repo and follow along the iPython notebook.
