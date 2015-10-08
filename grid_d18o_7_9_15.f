@@ -95,8 +95,8 @@ c      stop
       OPEN(204,FILE=trim(mldfile),FORM="UNFORMATTED",access=
      *     "SEQUENTIAL",convert="big_endian")
       print*,"Opening salinity file : WOAtemperature"
-      OPEN(205,FILE="WOAtemperature",FORM="UNFORMATTED",access=
-     *     "SEQUENTIAL",convert="big_endian")
+!      OPEN(205,FILE="WOAtemperature",FORM="UNFORMATTED",access=
+!     *     "SEQUENTIAL",convert="big_endian")
 
       do k=1,lmWOA
         read(200,end=9999) tempWOA(1:imWOA,1:jmWOA) !WOAs(1:imWOA,1:jmWOA,k)
@@ -117,13 +117,9 @@ c      stop
         WOAp(1:180,1:jmWOA,k)=tempWOA(181:imWOA,1:jmWOA)
         WOAp(181:imWOA,1:jmWOA,k)=tempWOA(1:180,1:jmWOA)
         !print*,"D"
-        salout="WOA 2001 Temperature Level "//trim(clev(k))
-        write(205) salout,WOAt(1:imWOA,1:jmWOA,k)
+!        salout="WOA 2001 Temperature Level "//trim(clev(k))
+!        write(205) salout,WOAt(1:imWOA,1:jmWOA,k)
       enddo
-!      goto 9999
-      print*,"Going"
-      !goto 9999
-
 
 
       print*,"Captured WOA 2001 salinity,temperature,oxygen,phosphate"
@@ -1374,52 +1370,54 @@ c      MASKC="SalMaskC.prn"     ! File to define ocean basins
 
       MASKA="WOAMaskA2.prn"
       MASKB="WOAMaskB2.prn"
-      MASKC="LeonArcMask3.prn"
-      
-      
-      PRINT*,"Special Arctic Waterbodies"
-      chukLonF="chukLon.txt"
-      chukLatF="chukLat.txt"
-      beauLonF="beauLon.txt"
-      beauLatF="beauLat.txt"
-      canLonF="canLon.txt"
-      canLatF="canLat.txt"
-      sibLonF="sibLon.txt"
-      sibLatF="sibLat.txt"
-      eurLonF="eurLon.txt"
-      eurLatF="eurLat.txt"
-      lomLonF="lomLon.txt"
-      lomLatF="lomLat.txt"
-      lapLonF="lapLon.txt"
-      lapLatF="lapLat.txt"
-      karLonF="karLon.txt"
-      karLatF="karLat.txt"
-      norLonF="norLon.txt"
-      norLatF="norLat.txt"
-      barLonF="barLon.txt"
-      barLatF="barLat.txt"
-         
-      OPEN(800,FILE=chukLonF,action="write",status="replace")
-      OPEN(801,FILE=chukLatF,action="write",status="replace")
-      OPEN(810,FILE=beauLonF,action="write",status="replace")
-      OPEN(811,FILE=beauLatF,action="write",status="replace")
-      OPEN(820,FILE=sibLonF,action="write",status="replace")
-      OPEN(821,FILE=sibLatF,action="write",status="replace")
-      OPEN(830,FILE=canLonF,action="write",status="replace")
-      OPEN(831,FILE=canLatF,action="write",status="replace")
-      OPEN(840,FILE=eurLonF,action="write",status="replace")
-      OPEN(841,FILE=eurLatF,action="write",status="replace")
-      OPEN(850,FILE=lomLonF,action="write",status="replace")
-      OPEN(851,FILE=lomLatF,action="write",status="replace")
-      OPEN(860,FILE=lapLonF,action="write",status="replace")
-      OPEN(861,FILE=lapLatF,action="write",status="replace")
-      OPEN(870,FILE=karLonF,action="write",status="replace")
-      OPEN(871,FILE=karLatF,action="write",status="replace")
-      OPEN(890,FILE=norLonF,action="write",status="replace")
-      OPEN(891,FILE=norLatF,action="write",status="replace")
-      OPEN(880,FILE=barLonF,action="write",status="replace")
-      OPEN(881,FILE=barLatF,action="write",status="replace")
-         
+      if(LeonMask.EQ.1) THEN
+        MASKC="LeonArcMask.prn" !11 reigons
+        !MASKC="LeonArcMask3.prn" !5 reigons
+        PRINT*,"Special Arctic Waterbodies"
+        chukLonF="chukLon.txt"
+        chukLatF="chukLat.txt"
+        beauLonF="beauLon.txt"
+        beauLatF="beauLat.txt"
+        canLonF="canLon.txt"
+        canLatF="canLat.txt"
+        sibLonF="sibLon.txt"
+        sibLatF="sibLat.txt"
+        eurLonF="eurLon.txt"
+        eurLatF="eurLat.txt"
+        lomLonF="lomLon.txt"
+        lomLatF="lomLat.txt"
+        lapLonF="lapLon.txt"
+        lapLatF="lapLat.txt"
+        karLonF="karLon.txt"
+        karLatF="karLat.txt"
+        norLonF="norLon.txt"
+        norLatF="norLat.txt"
+        barLonF="barLon.txt"
+        barLatF="barLat.txt"
+           
+        OPEN(800,FILE=chukLonF,action="write",status="replace")
+        OPEN(801,FILE=chukLatF,action="write",status="replace")
+        OPEN(810,FILE=beauLonF,action="write",status="replace")
+        OPEN(811,FILE=beauLatF,action="write",status="replace")
+        OPEN(820,FILE=sibLonF,action="write",status="replace")
+        OPEN(821,FILE=sibLatF,action="write",status="replace")
+        OPEN(830,FILE=canLonF,action="write",status="replace")
+        OPEN(831,FILE=canLatF,action="write",status="replace")
+        OPEN(840,FILE=eurLonF,action="write",status="replace")
+        OPEN(841,FILE=eurLatF,action="write",status="replace")
+        OPEN(850,FILE=lomLonF,action="write",status="replace")
+        OPEN(851,FILE=lomLatF,action="write",status="replace")
+        OPEN(860,FILE=lapLonF,action="write",status="replace")
+        OPEN(861,FILE=lapLatF,action="write",status="replace")
+        OPEN(870,FILE=karLonF,action="write",status="replace")
+        OPEN(871,FILE=karLatF,action="write",status="replace")
+        OPEN(890,FILE=norLonF,action="write",status="replace")
+        OPEN(891,FILE=norLatF,action="write",status="replace")
+        OPEN(880,FILE=barLonF,action="write",status="replace")
+        OPEN(881,FILE=barLatF,action="write",status="replace")
+      ELSE
+         MASKC="WOAMaskC2.prn" 
+      END IF
 
       PRINT*, "Opening Ocean Basin Definition Files: "
       PRINT*, trim(MASKA)
@@ -1530,12 +1528,13 @@ c     89 = Norweigan Sea
       n_depacind=23
 
       n_aacw_cdw=24
-
-      n_eurasian=25
-      n_lomonosov=26
-      n_beaufort=27
-      n_barents=28
-      n_chukchi=29
+      IF(LeonMask.EQ.1) THEN
+        n_eurasian=25
+        n_lomonosov=26
+        n_beaufort=27
+        n_barents=28
+        n_chukchi=29
+      ENDIF  
 
       n_basin(1)=n_mostNADW
       n_basin(2)=n_mostAABW
@@ -1547,100 +1546,160 @@ c     89 = Norweigan Sea
       n_basin(8)=n_aacw_cdw
       arcCount=0
       
-      PRINT*,"Searchig PRN files"
-      DO I=1,im                 ! Lon 360
-         DO J=1,jm              ! Lat 180
+      IF(LeonMask.EQ.1) THEN
+        PRINT*,"Searchig PRN files"
+        DO I=1,im                 ! Lon 360
+           DO J=1,jm              ! Lat 180
+              if((j.eq.1).and.(kt4(i,j).ne.77)) print*,"problem! ",i,j
+     *           ,kt4(i,j)
+              IF (KT4(i,j) .EQ. 80) THEN
+                 WorkM(I,J)=n_chukchi ! CHUKCHI
+                 arcLon=i
+                 arcLat=j
+                 WRITE(800,*)arcLon
+                 WRITE(801,*)arcLat
+c               print*,arcLon,arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 81) THEN !BEAUFORT
+                 Print*,"Beau"
+                 WorkM(I,J)=n_beaufort
+                 arcLon=i
+                 arcLat=j
+                 WRITE(810,*)arcLon !beauLonF
+                 WRITE(811,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 82) THEN !E SIBERIAN
+                 Print*,"sib"
+                 WorkM(I,J)=n_arcticoc
+                 arcLon=i
+                 arcLat=j
+                 WRITE(820,*)arcLon !sibLonF
+                 WRITE(821,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 83) THEN !CANADIAN
+                 PRINT*,"Can"
+                 WorkM(I,J)=n_arcticoc
+                 arcLon=i
+                 arcLat=j
+                 WRITE(830,*)arcLon !canLonF
+                 WRITE(831,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 84) THEN !EURASIAN
+                 PRINT*,"eur"
+                 WorkM(I,J)=n_eurasian
+                 arcLon=i
+                 arcLat=j
+                 WRITE(840,*)arcLon !euroLonF
+                 WRITE(841,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 85) THEN !LAM
+                 PRINT*,"Lam"
+                 WorkM(I,J)= n_lomonosov
+                 arcLon=i
+                 arcLat=j
+                 WRITE(850,*)arcLon
+                 WRITE(851,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 86) THEN !Laptev
+                 Print*,"Lap"
+                 WorkM(I,J)=n_arcticoc
+                 arcLon=i
+                 arcLat=j
+                 WRITE(860,*)arcLon
+                 WRITE(861,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 87) THEN !Kara
+                 Print*,"kara"
+                 WorkM(I,J)=n_arcticoc
+                 arcLon=i
+                 arcLat=j
+                 WRITE(870,*)arcLon
+                 WRITE(871,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 88) THEN !Barents Sea
+                 Print*,"Bar"
+                 WorkM(I,J)= n_barents
+                 arcLon=i
+                 arcLat=j
+                 WRITE(880,*)arcLon
+                 WRITE(881,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 89) THEN !Nowway
+                 WorkM(I,J)=n_arcticoc
+                 arcLon=i
+                 arcLat=j
+                 WRITE(890,*)arcLon
+                 WRITE(891,*)arcLat
+                 arcCount =  arcCount+1
+              ENDIF
+              IF (KT4(i,j) .EQ. 60) WorkM(I,J)=n_arcticoc ! Baltic Sea
+              IF (KT4(i,j) .EQ. 62) WorkM(I,J)=n_balticse ! Baltic Sea
+              IF (KT4(i,j) .EQ. 62) WorkM(I,J)=n_balticse ! Baltic Sea
+              IF (KT4(i,j) .EQ. 66) WorkM(I,J)=n_baffinba ! Baffin Bay
+              IF (KT4(i,j) .EQ. 63) WorkM(I,J)=n_hudsonba ! Hudson Bay
+              IF (KT4(i,j) .EQ. 61) WorkM(I,J)=n_labdorse ! Labrador Sea
+              IF (KT4(i,j) .EQ. 16) WorkM(I,J)=n_ginseatl ! N. N. Atl.
+              IF (KT4(i,j) .EQ. 10) WorkM(I,J)=n_northatl ! N. Atl
+              IF (KT4(i,j) .EQ. 18) WorkM(I,J)=n_mediterr ! Mediterrannean       
+              IF (KT4(i,j) .EQ. 11) WorkM(I,J)=n_tropiatl ! Tr. Atl
+              IF (KT4(i,j) .EQ. 14) WorkM(I,J)=n_southatl ! S. Atl         
+              IF (KT4(i,j) .EQ. 19) WorkM(I,J)=n_southocn ! Atl. Antarctic
+              IF (KT4(i,j) .EQ. 20) WorkM(I,J)=n_northpac ! N. Pac
+              IF (KT4(i,j) .EQ. 22) WorkM(I,J)=n_tropipac ! Tr. Pac
+              IF (KT4(i,j) .EQ. 24) WorkM(I,J)=n_southpac ! S. Pac
+              IF (KT4(i,j) .EQ. 29) WorkM(I,J)=n_southocn ! Pac. Antarctic
+              IF (KT4(i,j) .EQ. 38) WorkM(I,J)=n_reds_p_g ! Red Sea/Persian Gulf
+              IF (KT4(i,j) .EQ. 32) WorkM(I,J)=n_indianoc ! Indonesian Seas
+              IF (KT4(i,j) .EQ. 30) WorkM(I,J)=n_indianoc ! N. Indian
+              IF (KT4(i,j) .EQ. 34) WorkM(I,J)=n_indianoc ! S. Indian
+              IF (KT4(i,j) .EQ. 13) WorkM(I,J)=n_indianoc ! Indian
+              IF (KT4(i,j) .EQ. 39) WorkM(I,J)=n_southocn ! Ind. Antarctic
+              IF (KT4(i,j) .EQ. 48) WorkM(I,J)=0 ! Black Sea, not used
+              IF (KT4(i,j) .EQ. 58) WorkM(I,J)=0 ! Caspian Sea, not used
+              IF (KT4(i,j) .EQ. 77) WorkM(I,J)=0 ! Land
+           END DO                 ! J=1,jm
+        END DO                    ! I=1,im
+      
+        CLOSE(800)
+        CLOSE(801)
+        CLOSE(810)
+        CLOSE(811)
+        CLOSE(820)
+        CLOSE(821)
+        CLOSE(830)
+        CLOSE(831)
+        CLOSE(840)
+        CLOSE(841)
+        CLOSE(850)
+        CLOSE(851)
+        CLOSE(860)
+        CLOSE(861)
+        CLOSE(870)
+        CLOSE(871)
+        CLOSE(880)
+        CLOSE(881)
+        CLOSE(890)
+        CLOSE(891)
+      
+        PRINT*, arcCount
+        PRINT*,"Arctic Points found...",arcCount
+  !     print*,"Japan",workm(181+141,91+54)
+        PRINT*, "Ocean Basins Defined"
+      ELSE
+        PRINT*,"Searchig PRN files"
+        DO I=1,im                 ! Lon 360
+          DO J=1,jm              ! Lat 180
             if((j.eq.1).and.(kt4(i,j).ne.77)) print*,"problem! ",i,j
      *           ,kt4(i,j)
-            IF (KT4(i,j) .EQ. 80) THEN
-               WorkM(I,J)=n_chukchi ! CHUKCHI
-               arcLon=i
-               arcLat=j
-               WRITE(800,*)arcLon
-               WRITE(801,*)arcLat
-c               print*,arcLon,arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 81) THEN !BEAUFORT
-               Print*,"Beau"
-               WorkM(I,J)=n_beaufort
-               arcLon=i
-               arcLat=j
-               WRITE(810,*)arcLon !beauLonF
-               WRITE(811,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 82) THEN !E SIBERIAN
-               Print*,"sib"
-               WorkM(I,J)=n_arcticoc
-               arcLon=i
-               arcLat=j
-               WRITE(820,*)arcLon !sibLonF
-               WRITE(821,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 83) THEN !CANADIAN
-               PRINT*,"Can"
-               WorkM(I,J)=n_arcticoc
-               arcLon=i
-               arcLat=j
-               WRITE(830,*)arcLon !canLonF
-               WRITE(831,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 84) THEN !EURASIAN
-               PRINT*,"eur"
-               WorkM(I,J)=n_eurasian
-               arcLon=i
-               arcLat=j
-               WRITE(840,*)arcLon !euroLonF
-               WRITE(841,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 85) THEN !LAM
-               PRINT*,"Lam"
-               WorkM(I,J)= n_lomonosov
-               arcLon=i
-               arcLat=j
-               WRITE(850,*)arcLon
-               WRITE(851,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 86) THEN !Laptev
-               Print*,"Lap"
-               WorkM(I,J)=n_arcticoc
-               arcLon=i
-               arcLat=j
-               WRITE(860,*)arcLon
-               WRITE(861,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 87) THEN !Kara
-               Print*,"kara"
-               WorkM(I,J)=n_arcticoc
-               arcLon=i
-               arcLat=j
-               WRITE(870,*)arcLon
-               WRITE(871,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 88) THEN !Barents Sea
-               Print*,"Bar"
-               WorkM(I,J)= n_barents
-               arcLon=i
-               arcLat=j
-               WRITE(880,*)arcLon
-               WRITE(881,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
-            IF (KT4(i,j) .EQ. 89) THEN !Nowway
-               WorkM(I,J)=n_arcticoc
-               arcLon=i
-               arcLat=j
-               WRITE(890,*)arcLon
-               WRITE(891,*)arcLat
-               arcCount =  arcCount+1
-            ENDIF
             IF (KT4(i,j) .EQ. 60) WorkM(I,J)=n_arcticoc ! Baltic Sea
             IF (KT4(i,j) .EQ. 62) WorkM(I,J)=n_balticse ! Baltic Sea
             IF (KT4(i,j) .EQ. 62) WorkM(I,J)=n_balticse ! Baltic Sea
@@ -1666,36 +1725,9 @@ c               print*,arcLon,arcLat
             IF (KT4(i,j) .EQ. 48) WorkM(I,J)=0 ! Black Sea, not used
             IF (KT4(i,j) .EQ. 58) WorkM(I,J)=0 ! Caspian Sea, not used
             IF (KT4(i,j) .EQ. 77) WorkM(I,J)=0 ! Land
-         END DO                 ! J=1,jm
-      END DO                    ! I=1,im
-      
-      CLOSE(800)
-      CLOSE(801)
-      CLOSE(810)
-      CLOSE(811)
-      CLOSE(820)
-      CLOSE(821)
-      CLOSE(830)
-      CLOSE(831)
-      CLOSE(840)
-      CLOSE(841)
-      CLOSE(850)
-      CLOSE(851)
-      CLOSE(860)
-      CLOSE(861)
-      CLOSE(870)
-      CLOSE(871)
-      CLOSE(880)
-      CLOSE(881)
-      CLOSE(890)
-      CLOSE(891)
-      
-      PRINT*, arcCount
-      PRINT*,"Arctic Points found...",arcCount
-!     print*,"Japan",workm(181+141,91+54)
-      PRINT*, "Ocean Basins Defined"
-
-
+          END DO                 ! J=1,jm
+        END DO                    ! I=1,im
+      END IF
 
 
 *******Define Compatible regions 
@@ -1790,11 +1822,14 @@ c      as(n_mostaabw,3)=n_nadwaabw ! with NADWAABW
       basincode(n_aacw_cdw)="AACW_CDW" ! Antarctic Commonwater/ Common DW
 
       !Leon added artic
-      basincode(n_eurasian)= "Eurasian" ! 
-      basincode(n_lomonosov)="Lomonoso" ! 
-      basincode(n_barents)=  "BarentsS" ! 
-      basincode(n_beaufort)= "Beaufort" !  
-      basincode(n_chukchi)=  "ChukchiS" !  
+      IF(LeonMask.EQ.1) THEN
+        basincode(n_eurasian)= "Eurasian" ! 
+        basincode(n_lomonosov)="Lomonoso" ! 
+        basincode(n_barents)=  "BarentsS" ! 
+        basincode(n_beaufort)= "Beaufort" !  
+        basincode(n_chukchi)=  "ChukchiS" ! 
+      ENDIF
+
       do k=1,regct
         as(k,1)=1
         do i=3,6
